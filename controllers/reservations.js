@@ -50,12 +50,10 @@ exports.getReservation = async (req, res, next) => {
     });
 
     if (!reservation) {
-      return res
-        .status(404)
-        .json({
-          success: false,
-          message: `No reservation with the id of ${req.params.id}`,
-        });
+      return res.status(404).json({
+        success: false,
+        message: `No reservation with the id of ${req.params.id}`,
+      });
     }
 
     res.status(200).json({ success: true, data: reservation.dataValues });
@@ -73,12 +71,10 @@ exports.addReservation = async (req, res, next) => {
       req.params.coworkingSpaceId
     );
     if (!coworkingspace) {
-      return res
-        .status(404)
-        .json({
-          success: false,
-          message: `No coworking space with the id of ${req.params.coworkingSpaceId}`,
-        });
+      return res.status(404).json({
+        success: false,
+        message: `No coworking space with the id of ${req.params.coworkingSpaceId}`,
+      });
     }
     // Add userId to req.body
     req.body.userId = req.user.id;
@@ -88,12 +84,10 @@ exports.addReservation = async (req, res, next) => {
     });
     // If the user is not an admin, they can only create 3 reservations
     if (existedReservations.length >= 3 && !req.user.isAdmin) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: `The user with ID ${req.user.id} has already made 3 reservations`,
-        });
+      return res.status(400).json({
+        success: false,
+        message: `The user with ID ${req.user.id} has already made 3 reservations`,
+      });
     }
     const reservation = await Reservation.create(req.body);
     res.status(201).json({ success: true, data: reservation });
@@ -108,22 +102,18 @@ exports.updateReservation = async (req, res, next) => {
   try {
     const reservation = await Reservation.findByPk(req.params.id);
     if (!reservation) {
-      return res
-        .status(404)
-        .json({
-          success: false,
-          message: `No reservation with id ${req.params.id}`,
-        });
+      return res.status(404).json({
+        success: false,
+        message: `No reservation with id ${req.params.id}`,
+      });
     }
 
     // Make sure user is the reservation owner
     if (reservation.dataValues.userId !== req.user.id && !req.user.isAdmin) {
-      return res
-        .status(401)
-        .json({
-          success: false,
-          message: `user ${req.user.id} is not authorized to update this reservation`,
-        });
+      return res.status(401).json({
+        success: false,
+        message: `user ${req.user.id} is not authorized to update this reservation`,
+      });
     }
 
     await reservation.update(req.body);
@@ -142,22 +132,18 @@ exports.deleteReservation = async (req, res, next) => {
   try {
     const reservation = await Reservation.findByPk(req.params.id);
     if (!reservation) {
-      return res
-        .status(404)
-        .json({
-          success: false,
-          message: `No reservation with id ${req.params.id}`,
-        });
+      return res.status(404).json({
+        success: false,
+        message: `No reservation with id ${req.params.id}`,
+      });
     }
 
     // Make sure user is the reservation owner
     if (reservation.dataValues.userId !== req.user.id && !req.user.isAdmin) {
-      return res
-        .status(401)
-        .json({
-          success: false,
-          message: `User ${req.user.id} is not authorized to delete this reservation`,
-        });
+      return res.status(401).json({
+        success: false,
+        message: `User ${req.user.id} is not authorized to delete this reservation`,
+      });
     }
 
     await reservation.destroy();
