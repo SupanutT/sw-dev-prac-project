@@ -2,11 +2,50 @@
 const express = require("express");
 const dotenv = require("dotenv");
 const app = express();
+const cookieParser = require("cookie-parser");
+const helmet = require("helmet");
+const { xss } = require("express-xss-sanitizer");
+const rateLimit = require("express-rate-limit");
+const hpp = require("hpp");
+const cors = require("cors");
+const swaggerJsDoc = require("swagger-jsdoc");
+const swaggerUI = require("swagger-ui-express");
 
 dotenv.config({ path: "./config/config.env" });
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+app.use(cookieParser());
+app.use(helmet());
+app.use(xss());
+const limiter = rateLimit({
+  windowsMs: 10 * 60 * 1000, //10mins
+  max: 100,
+});
+app.use(limiter);
+app.use(hpp());
+app.use(cors());
+
+const swaggerOptions = {
+  swaggerDefinition: {
+    openapi: "3.0.0",
+    info: {
+      title: "Library API",
+      version: "1.0.0",
+      description: "A simple Express Coworking Space API",
+    },
+    servers: [
+      {
+        url: "http://localhost:5000/api/v1",
+      },
+    ],
+  },
+
+  apis: ["./routes/*.js"],
+};
+
+const swaggerDocs = swaggerJsDoc(swaggerOptions);
+app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(swaggerDocs));
 
 /* Import routes */
 const auth = require("./routes/auth");

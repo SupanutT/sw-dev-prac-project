@@ -77,6 +77,25 @@ module.exports = (sequelize, DataTypes) => {
           const hashedPassword = await hashPassword(user.hashedPassword);
           user.hashedPassword = hashedPassword;
         },
+        beforeValidate: (user, options) => {
+          const Joi = require("joi");
+          const _ = require("lodash");
+          const joiSchema = Joi.object({
+            firstName: Joi.string(),
+            lastName: Joi.string(),
+            phoneNumber: Joi.string(),
+            email: Joi.string(),
+            hashedPassword: Joi.string(),
+            isAdmin: Joi.boolean(),
+            isActive: Joi.boolean(),
+            activateAccountExpire: Joi.date(),
+            activateAccountToken: Joi.date(),
+          });
+          const { error, value } = joiSchema.validate(
+            _.pick(user.dataValues, [...user._changed])
+          );
+          if (error) throw new Error(error);
+        },
       },
     }
   );
