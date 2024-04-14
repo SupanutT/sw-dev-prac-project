@@ -40,14 +40,19 @@ exports.protect = async (req, res, next) => {
 
 exports.authorize = (...roles) => {
   return (req, res, next) => {
-    if (roles.includes("admin") && !req.user.isAdmin) {
-      return res
-        .status(403)
-        .json({
-          sucess: false,
-          message: `User role ${req.user.role} is not authorized to access this route`,
-        });
+    if (
+      (roles.includes("admin") && req.user.isAdmin) ||
+      (roles.includes("user") && !req.user.isAdmin)
+    ) {
+      return next();
     }
-    next();
+    res
+      .status(403)
+      .json({
+        sucess: false,
+        message: `User role ${
+          req.user.isAdmin ? "admin" : "user"
+        } is not authorized to access this route`,
+      });
   };
 };

@@ -11,9 +11,11 @@ app.use(express.json());
 /* Import routes */
 const auth = require("./routes/auth");
 const coworkingspaces = require("./routes/coworkingspaces");
+const reservations = require("./routes/reservations");
 
 app.use("/api/v1/auth", auth);
 app.use("/api/v1/coworkingspaces", coworkingspaces);
+app.use("/api/v1/reservations", reservations);
 
 app.use((err, req, res, next) => {
   // format error

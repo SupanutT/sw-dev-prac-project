@@ -7,8 +7,11 @@ const {
   deleteCoworkingSpace,
 } = require("../controllers/coworkingspaces");
 const { protect, authorize } = require("../middleware/auth");
+const reservationRouter = require("./reservations");
 
 const router = express.Router();
+
+router.use("/:coworkingSpaceId/reservations/", reservationRouter);
 
 router
   .route("/")
