@@ -2,11 +2,15 @@
 const express = require('express');
 const dotenv = require('dotenv');
 const app = express();
-const sequelize = require('./config/database.config');
 
 dotenv.config({ path: './config/config.env' });
 
 app.use(express.json());
+
+/* Import routes */
+const auth = require('./routes/auth');
+
+app.use('/api/v1/auth', auth);
 
 app.use((err, req, res, next) => {
     // format error
@@ -23,8 +27,3 @@ process.on('unhandledRejection', (err, promise) => {
     console.log(`Error: ${err.message}`);
     server.close(() => process.exit(1));
 });
-
-sequelize
-    .sync()
-    .then(() => console.log('Database connected'))
-    .catch((err) => console.error('Database connection error:', err));
