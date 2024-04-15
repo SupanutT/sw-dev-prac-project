@@ -10,7 +10,7 @@ module.exports = {
                     lastName: 'Tangsinmankong',
                     phoneNumber: '0801234567',
                     email: 'test@test.com',
-                    hashedPassword: '$2y$10$JErKhLlgJEJeYjQe0CYkt.WptaZ5nKrdWqLC.yKSdluPAWsDghxN.'
+                    password: 'root1234'
                 }
             ],
             {}

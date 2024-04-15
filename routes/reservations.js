@@ -35,7 +35,8 @@
  *         createdAt: 2024-04-04T14:31:35.000Z
  *         updatedAt: 2024-04-04T14:31:35.000Z
  *         deletedAt: null
- *     ReservationCore:
+ *   requestBodies:
+ *     ReservationBody:
  *       type: object
  *       properties:
  *         userId:
@@ -56,7 +57,7 @@
  * @swagger
  * tags:
  *   name: Reservations
- *   description: The reservation managing API
+ *   description: The reservations managing API
  */
 /**
  * @swagger
@@ -117,7 +118,7 @@
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/ReservationCore'
+ *             $ref: '#/components/requestBodies/ReservationBody'
  *     responses:
  *       200:
  *         description: The reservation was updated
@@ -149,6 +150,7 @@
  *         description: Some error happened
  *
  */
+
 const express = require('express');
 const { getReservations, getReservation, addReservation, updateReservation, deleteReservation } = require('../controllers/reservations');
 const { protect, authorize } = require('../middleware/auth');

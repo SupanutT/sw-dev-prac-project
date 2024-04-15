@@ -1,5 +1,7 @@
 const models = require('../sequelize/models');
 const User = models.User;
+const nodemailer = require('nodemailer');
+const randomToken = require('random-token');
 
 //@desc     Register user
 //@route    POST /api/v1/auth/register
@@ -8,7 +10,8 @@ exports.register = async (req, res, next) => {
     try {
         const newUser = req.body;
         const user = await User.create(newUser);
-        sendTokenResponse(user, 200, res);
+        await sendActivateAccountToken(user);
+        sendTokenResponse(user, 201, res);
     } catch (err) {
         res.status(400).json({ success: false });
         console.log(err.stack);
@@ -68,7 +71,7 @@ const sendTokenResponse = (user, statusCode, res) => {
         id: user.dataValues.id,
         firstName: user.dataValues.firstName,
         lastName: user.dataValues.lastName,
-        emaiL: user.email
+        email: user.email
     });
 };
 
@@ -78,4 +81,77 @@ const sendTokenResponse = (user, statusCode, res) => {
 exports.getMe = async (req, res, next) => {
     const user = await User.findByPk(req.user.id);
     res.status(200).json({ success: true, data: user.dataValues });
+};
+
+exports.activate = async (req, res, next) => {
+    try {
+        const user = await User.findOne({
+            where: {
+                activateAccountToken: req.params.id
+            }
+        });
+
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'The user is not found' });
+        }
+
+        if (user.isActive) {
+            return res.status(400).json({ success: false, message: 'The user is already active' });
+        }
+
+        if (new Date(user.activateAccountExpire) < new Date()) {
+            return res.status(400).json({ success: false, message: 'The user activation code is expired' });
+        }
+
+        user.isActive = true;
+        await user.save();
+        res.status(200).json({ success: true, message: 'The user is successfully activated' });
+    } catch (err) {
+        res.status(400).json({ success: false });
+    }
+};
+
+const transporter = nodemailer.createTransport({
+    service: 'Gmail',
+    host: 'smtp.gmail.com',
+    port: 465,
+    secure: true,
+    auth: {
+        user: 'swdevpraccoworkingspace@gmail.com',
+        pass: 'ugnu trjq urup irum'
+    }
+});
+
+const sendActivateAccountToken = async (user) => {
+    const email = user.email;
+    const activateAccountToken = randomToken(16);
+    user.activateAccountToken = activateAccountToken;
+    const today = new Date();
+    const activateAccountExpire = new Date(today.setDate(today.getDate() + 1));
+    // const activateAccountExpire = today;
+    user.activateAccountExpire = activateAccountExpire;
+    await user.save();
+    sendEmail(
+        user.email,
+        'Activate Account',
+        `Please activate your account in 24 hours using the link below:<br>
+<a href="${process.env.BACKEND_URL}/api/v1/auth/activate/${activateAccountToken}">LINK</a>`
+    );
+};
+
+const sendEmail = (email, subject, text) => {
+    const mailOptions = {
+        from: process.env.GMAIL_EMAIL,
+        to: email,
+        subject: subject,
+        html: text
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+            throw {
+                message: error.message
+            };
+        }
+    });
 };

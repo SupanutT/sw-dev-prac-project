@@ -25,6 +25,8 @@
     "jsonwebtoken": "^9.0.2",
     "lodash": "^4.17.21",
     "mysql2": "^3.9.4",
+    "nodemailer": "^6.9.13",
+    "random-token": "^0.0.8",
     "sequelize": "^6.37.3",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.0"

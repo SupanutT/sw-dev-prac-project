@@ -43,7 +43,8 @@
  *         createdAt: 2024-04-04T15:55:58.784Z
  *         updatedAt: 2024-04-04T15:55:58.784Z
  *         deletedAt: null
- *     CoworkingSpaceCore:
+ *   requestBodies:
+ *     CoworkingSpaceBody:
  *       type: object
  *       properties:
  *         name:
@@ -134,7 +135,7 @@
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/CoworkingSpaceCore'
+ *             $ref: '#/components/requestBodies/CoworkingSpaceBody'
  *     responses:
  *       201:
  *         description: The coworking space was successfully created
@@ -186,7 +187,7 @@
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/CoworkingSpaceCore'
+ *             $ref: '#/components/requestBodies/CoworkingSpaceBody'
  *     responses:
  *       200:
  *         description: The coworking space was updated
@@ -258,15 +259,18 @@
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/ReservationCore'
+ *             $ref: '#/components/requestBodies/ReservationBody'
  *     responses:
  *       201:
- *         description: The reservation was successfullt created
+ *         description: The reservation was successfully created
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/Reservation'
+ *       500:
+ *         description: Some error happened
  */
+
 const express = require('express');
 const {
     getCoworkingSpaces,
