@@ -14,12 +14,18 @@ database "<<MySQL>>\n:coworkingspaces" as CoworkingSpacesDatabase
 
 client->server ++:req.post('/coworkingspaces')
 server->routerCoworkingSpaces ++:app.use('/coworkingspaces',coworkingspaces)
-routerCoworkingSpaces -> middleware ++:protect()
-routerCoworkingSpaces -> controllersCoworkingSpaces ++:createCoworkingSpace()
+routerCoworkingSpaces -> middleware ++:protect()\nauthorize('admin')
+alt Already logged in and correct role
+    middleware -> controllersCoworkingSpaces ++: createCoworkingSpace()
+else Not logged in yet
+    middleware --> client : res.status(401).json({ sucess: false, message: 'Not authorize to access this route' })
+else Wrong role
+    middleware --> client --: res.status(403).json({ sucess: false, message: `User role ${req.user.role} is not authorized to access this route` })
+end
 controllersCoworkingSpaces-> modelCoworkingSpace ++:create(req.body)
 modelCoworkingSpace -> CoworkingSpacesDatabase ++: CoworkingSpaceSchema
 CoworkingSpacesDatabase --> modelCoworkingSpace --: coworkingspace
 controllersCoworkingSpaces <-- modelCoworkingSpace --:coworkingspace
-controllersCoworkingSpaces->client --:response
+controllersCoworkingSpaces --> client --: res.status(200).json({ success: true, data: coworkingspace })
 
 @enduml
