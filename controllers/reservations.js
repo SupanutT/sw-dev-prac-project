@@ -6,7 +6,7 @@ exports.getReservations = async (req, res, next) => {
   try {
     // Generatl users can see only their reservations!
     let reservations;
-    if (!req.user.isAdmin) {
+    if (req.user.role === "user") {
       reservations = await Reservation.findAll({
         where: {
           userId: req.user.id,
@@ -78,12 +78,16 @@ exports.addReservation = async (req, res, next) => {
     }
     // Add userId to req.body
     req.body.userId = req.user.id;
+    console.log(req.user.id);
     // Check for existed reservations
     const existedReservations = await Reservation.findAll({
-      user: req.user.id,
+      where: {
+        userId: req.user.id,
+      },
     });
     // If the user is not an admin, they can only create 3 reservations
-    if (existedReservations.length >= 3 && !req.user.isAdmin) {
+    console.log(existedReservations);
+    if (existedReservations.length >= 3 && req.user.role !== "admin") {
       return res.status(400).json({
         success: false,
         message: `The user with ID ${req.user.id} has already made 3 reservations`,
@@ -109,7 +113,10 @@ exports.updateReservation = async (req, res, next) => {
     }
 
     // Make sure user is the reservation owner
-    if (reservation.dataValues.userId !== req.user.id && !req.user.isAdmin) {
+    if (
+      reservation.dataValues.userId !== req.user.id &&
+      req.user.role !== "admin"
+    ) {
       return res.status(401).json({
         success: false,
         message: `user ${req.user.id} is not authorized to update this reservation`,
@@ -139,7 +146,10 @@ exports.deleteReservation = async (req, res, next) => {
     }
 
     // Make sure user is the reservation owner
-    if (reservation.dataValues.userId !== req.user.id && !req.user.isAdmin) {
+    if (
+      reservation.dataValues.userId !== req.user.id &&
+      req.user.role !== "admin"
+    ) {
       return res.status(401).json({
         success: false,
         message: `User ${req.user.id} is not authorized to delete this reservation`,

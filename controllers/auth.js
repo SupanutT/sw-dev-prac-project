@@ -28,12 +28,10 @@ exports.login = async (req, res, next) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "Please provide an email and password",
-        });
+      return res.status(400).json({
+        success: false,
+        message: "Please provide an email and password",
+      });
     }
 
     const user = await User.findOne({
@@ -76,6 +74,21 @@ exports.getMe = async (req, res, next) => {
   res.status(200).json({ success: true, data: user.dataValues });
 };
 
+//@desc     Log user out / clear cookie
+//@route    GET /api/v1/auth/logout
+//@access   Private
+exports.logout = async (req, res, next) => {
+  res.cookie("token", "none", {
+    expires: new Date(Date.now() + 10 * 1000),
+    httpOnly: true,
+  });
+
+  res.status(200).json({
+    success: true,
+    data: {},
+  });
+};
+
 //@desc     Activate the user
 //@route    GET /api/v1/auth/activate/:id
 //@access   Private
@@ -100,12 +113,10 @@ exports.activate = async (req, res, next) => {
     }
 
     if (new Date(user.activateAccountExpire) < new Date()) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "The user activation code is expired",
-        });
+      return res.status(400).json({
+        success: false,
+        message: "The user activation code is expired",
+      });
     }
 
     user.isActive = true;

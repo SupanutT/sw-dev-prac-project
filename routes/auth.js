@@ -212,15 +212,22 @@
  *         description: Some error happened
  */
 
-const express = require('express');
-const { register, login, getMe, activate } = require('../controllers/auth');
-const { protect } = require('../middleware/auth');
+const express = require("express");
+const {
+  register,
+  login,
+  getMe,
+  activate,
+  logout,
+} = require("../controllers/auth");
+const { protect } = require("../middleware/auth");
 
 const router = express.Router();
 
-router.post('/register', register);
-router.post('/login', login);
-router.get('/me', protect, getMe);
-router.get('/activate/:id', activate);
+router.post("/register", register);
+router.post("/login", login);
+router.get("/logout", logout);
+router.get("/me", protect, getMe);
+router.get("/activate/:id", activate);
 
 module.exports = router;
