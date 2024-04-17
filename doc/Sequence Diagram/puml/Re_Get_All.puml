@@ -1,0 +1,23 @@
+@startuml Manage Reservation (GET ALL)
+
+header Coworking Space Reservation System Sequence Diagram
+footer Group Yossawat & Supanut
+title "Manage Reservation (GET ALL)"
+
+participant "Client" as client
+participant "<<javaScript>>\n:server" as server
+participant "<<router>>\n:reservations" as routerReservations
+participant "<<controllers>>\n:reservations" as controllersReservations
+participant "<<model>>\n:Reservations" as modelReservation
+database "<<MySQL>>\n:reservations" as ReservationsDatabase
+
+client -> server ++:req.get('/reservations')
+server -> routerReservations ++:app.use('/reservations' ,reservations)
+routerReservations -> controllersReservations ++: getReservations()
+controllersReservations -> modelReservation ++: findAll()
+modelReservation -> ReservationsDatabase ++: ReservationSchema
+ReservationsDatabase --> modelReservation --: reservations
+controllersReservations <-- modelReservation --: reservations
+controllersReservations -> client --:response
+
+@enduml

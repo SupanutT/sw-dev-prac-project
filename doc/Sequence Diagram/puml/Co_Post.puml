@@ -1,0 +1,25 @@
+@startuml Manage CoworkingSpace (POST)
+
+header Coworking Space Reservation System Sequence Diagram
+footer Group Yossawat & Supanut
+title "Manage CoworkingSpace (POST)"
+
+participant "Client" as client
+participant "<<javaScript>>\n:server" as server
+participant "<<router>>\n:coworkingspaces" as routerCoworkingSpaces
+participant "<<middleware>>\n:auth" as middleware
+participant "<<controllers>>\n:coworkingspaces" as controllersCoworkingSpaces
+participant "<<model>>\n:CoworkingSpace" as modelCoworkingSpace
+database "<<MySQL>>\n:coworkingspaces" as CoworkingSpacesDatabase
+
+client->server ++:req.post('/coworkingspaces')
+server->routerCoworkingSpaces ++:app.use('/coworkingspaces',coworkingspaces)
+routerCoworkingSpaces -> middleware ++:protect()
+routerCoworkingSpaces -> controllersCoworkingSpaces ++:createCoworkingSpace()
+controllersCoworkingSpaces-> modelCoworkingSpace ++:create(req.body)
+modelCoworkingSpace -> CoworkingSpacesDatabase ++: CoworkingSpaceSchema
+CoworkingSpacesDatabase --> modelCoworkingSpace --: coworkingspace
+controllersCoworkingSpaces <-- modelCoworkingSpace --:coworkingspace
+controllersCoworkingSpaces->client --:response
+
+@enduml
