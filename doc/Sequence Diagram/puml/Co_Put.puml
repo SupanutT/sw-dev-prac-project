@@ -24,8 +24,8 @@ else Wrong role
 end
 controllersCoworkingSpaces-> modelCoworkingSpace ++:update(req.params.id, req.body)
 modelCoworkingSpace -> CoworkingSpacesDatabase ++: CoworkingSpaceSchema
-CoworkingSpacesDatabase --> modelCoworkingSpace --: coworkingspace
-controllersCoworkingSpaces <-- modelCoworkingSpace --:coworkingspace
-controllersCoworkingSpaces-->client --:response
+CoworkingSpacesDatabase --> modelCoworkingSpace --: modifiedCoworkingSpace
+controllersCoworkingSpaces <-- modelCoworkingSpace --: modifiedCoworkingSpace
+controllersCoworkingSpaces-->client --: res.status(200).json({ success: true, data: modifiedCoworkingSpace.dataValues })
 
 @enduml

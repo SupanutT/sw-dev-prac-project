@@ -18,6 +18,6 @@ controllersCoworkingSpaces-> modelCoworkingSpace ++:findByPk(req.params.id)
 modelCoworkingSpace -> CoworkingSpacesDatabase ++: CoworkingSpaceSchema
 CoworkingSpacesDatabase --> modelCoworkingSpace --: coworkingspace
 controllersCoworkingSpaces <-- modelCoworkingSpace --:coworkingspace
-controllersCoworkingSpaces->client --:response
+controllersCoworkingSpaces-->client --:res.status(200).json({ success: true, data: coworkingspace.dataValues });
 
 @enduml

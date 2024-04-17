@@ -26,6 +26,6 @@ controllersCoworkingSpaces-> modelCoworkingSpace ++:create(req.body)
 modelCoworkingSpace -> CoworkingSpacesDatabase ++: CoworkingSpaceSchema
 CoworkingSpacesDatabase --> modelCoworkingSpace --: coworkingspace
 controllersCoworkingSpaces <-- modelCoworkingSpace --:coworkingspace
-controllersCoworkingSpaces --> client --: res.status(200).json({ success: true, data: coworkingspace })
+controllersCoworkingSpaces --> client --: res.status(201).json({ success: true, data: coworkingspace.dataValues });
 
 @enduml
