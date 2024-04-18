@@ -3,18 +3,30 @@ left to right direction
 actor "User" as user
 rectangle "Coworking Space Reservation System" as CSRSystem {
     usecase "Register" as register
+    usecase "Login" as login
+    usecase "Logout" as logout
+    usecase "Activate\nAccount" as activateAccount
     usecase "View\nCoworking Spaces" as viewCoworkingSpaces
     usecase "Manage\nReservation" as manageReservation
     usecase "Manage\nCoworking Space" as manageCoworkingSpace
 }
 
 user -- register
+user -- login
+user -- logout
+user -- activateAccount
 user -- viewCoworkingSpaces
 user -- manageReservation
 
 actor "Admin" as admin
 register -- admin
+login -- admin
+logout -- admin
+activateAccount -- admin
 manageReservation -- admin
 manageCoworkingSpace -- admin
+
+actor "<<service>>\nGoogle SMTP" as smtp
+activateAccount -- smtp
 
 @enduml

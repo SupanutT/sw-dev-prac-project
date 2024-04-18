@@ -10,7 +10,7 @@ participant "<<router>>\n:auth" as routerAuth
 participant "<<controllers>>\n:auth" as controllersAuth
 participant "<<utils>>\n:auth" as utilsAuth
 participant "<<model>>\n:User" as modelUser
-database "<<MySQL>>\n:users" as UserDatabase
+database "<<MySQL>>\n:coworkingspaces" as UserDatabase
 
 client->server ++:req.post('/login')
 server->routerAuth ++:app.use('/auth',auth)
