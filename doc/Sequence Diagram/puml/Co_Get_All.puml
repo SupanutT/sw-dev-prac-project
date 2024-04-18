@@ -18,6 +18,6 @@ controllersCoworkingSpaces-> modelCoworkingSpace ++:findAll()
 modelCoworkingSpace -> CoworkingSpacesDatabase ++: CoworkingSpaceSchema
 CoworkingSpacesDatabase --> modelCoworkingSpace --: coworkingspaces
 controllersCoworkingSpaces <-- modelCoworkingSpace --:coworkingspaces
-controllersCoworkingSpaces-->client --:res.status(200).json({ success: true, count: coworkingspaces.length, data: coworkingspaces });
+controllersCoworkingSpaces-->client --:res.status(200).json({ success: true, count: coworkingspaces.length, data: coworkingspaces })
 
 @enduml

@@ -10,7 +10,7 @@ participant "<<router>>\n:reservations" as routerReservations
 participant "<<middleware>>\n:auth" as middleware
 participant "<<controllers>>\n:reservations" as controllersReservations
 participant "<<model>>\n:Reservations" as modelReservation
-database "<<MySQL>>\n:reservations" as ReservationsDatabase
+database "<<MySQL>>\n:coworkingspaces" as CoworkingSpacesDatabase
 
 client -> server ++:req.get('/reservations/:id')
 server -> routerReservations ++:app.use('/reservations' ,reservations)
@@ -22,9 +22,13 @@ else Not logged in yet
     middleware --> client : res.status(401).json({ sucess: false, message: 'Not authorize to access this route' })
 end
 controllersReservations -> modelReservation ++: findOne(req.params.id)
-modelReservation -> ReservationsDatabase ++: ReservationSchema
-ReservationsDatabase --> modelReservation --: reservation
+modelReservation -> CoworkingSpacesDatabase ++: ReservationSchema
+CoworkingSpacesDatabase --> modelReservation --: reservation
 controllersReservations <-- modelReservation --: reservation
-controllersReservations --> client --:res.status(200).json({ success: true, data: reservation.dataValues });
+alt found in database
+    controllersReservations --> client :res.status(200).json({ success: true, data: reservation.dataValues })
+else not found in database
+    controllersReservations --> client --: res.status(404).json({ success: false, message: `No reservation with the id of ${req.params.id}` })
+end
 
 @enduml

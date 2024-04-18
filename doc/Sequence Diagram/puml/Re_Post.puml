@@ -10,8 +10,9 @@ participant "<<router>>\n:coworkingspaces" as routerCoworkingSpaces
 participant "<<router>>\n:reservations" as routerReservations
 participant "<<middleware>>\n:auth" as middleware
 participant "<<controllers>>\n:reservations" as controllersReservations
+participant "<<model>>\n:CoworkingSpace" as modelCoworkingSpace
 participant "<<model>>\n:Reservations" as modelReservation
-database "<<MySQL>>\n:reservations" as ReservationsDatabase
+database "<<MySQL>>\n:coworkingspaces" as CoworkingSpacesDatabase
 
 client -> server ++:req.post('/coworkingspaces/:coworkingSpaceId/reservations/')
 server -> routerCoworkingSpaces ++:app.use('/coworkingspaces',coworkingspaces)
@@ -25,10 +26,26 @@ else Not logged in yet
 else Wrong role
     middleware --> client --: res.status(403).json({ sucess: false, message: `User role ${req.user.role} is not authorized to access this route` })
 end
-controllersReservations -> modelReservation ++: create(req.params.coworkingSpaceId, req.body)
-modelReservation -> ReservationsDatabase ++: ReservationSchema
-ReservationsDatabase --> modelReservation --: reservation
+controllersReservations -> modelCoworkingSpace ++: findByPk(req.params.coworkingSpaceId)
+modelCoworkingSpace -> CoworkingSpacesDatabase ++: CoworkingSpaceSchema
+CoworkingSpacesDatabase --> modelCoworkingSpace --: coworkingspace
+controllersReservations <-- modelCoworkingSpace --:coworkingspace
+alt found coworking space in database
+    controllersReservations -> modelReservation  ++: findAll(req.user.id)
+else not found coworking space in database
+    controllersReservations --> client  : res.status(404).json({ success: false,message: `No coworking space with the id of ${req.params.coworkingSpaceId}` })
+end
+modelReservation -> CoworkingSpacesDatabase ++: ReservationSchema
+CoworkingSpacesDatabase --> modelReservation : reservation
+controllersReservations <-- modelReservation : reservation
+alt user already create 3 reservations and he/she is not an admin
+    controllersReservations --> client : res.status(400).json({ success: false, message: `The user with ID ${req.user.id} has already made 3 reservations` })
+else otherwise
+    controllersReservations -> modelReservation : create(req.user.id, req.params.coworkingSpaceId, req.body)
+end
+modelReservation -> CoworkingSpacesDatabase : ReservationSchema
+CoworkingSpacesDatabase --> modelReservation --: reservation
 controllersReservations <-- modelReservation --: reservation
-controllersReservations --> client --:res.status(201).json({ success: true, data: reservation });
+controllersReservations --> client --:res.status(201).json({ success: true, data: reservation })
 
 @enduml

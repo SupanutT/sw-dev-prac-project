@@ -23,10 +23,19 @@ else Not logged in yet
 else Wrong role
     middleware --> client --: res.status(403).json({ sucess: false, message: `User role ${req.user.role} is not authorized to access this route` })
 end
-controllersCoworkingSpaces-> modelCoworkingSpace ++:update(req.params.id, req.body)
-modelCoworkingSpace -> CoworkingSpacesDatabase ++: CoworkingSpaceSchema
+controllersCoworkingSpaces -> modelCoworkingSpace ++: findByPk(req.params.id)
+modelCoworkingSpace -> CoworkingSpacesDatabase ++: CoWorkingSpaceSchema
+CoworkingSpacesDatabase --> modelCoworkingSpace : coworkingspace
+controllersCoworkingSpaces <-- modelCoworkingSpace : coworkingspace
+alt found in database
+    controllersCoworkingSpaces -> modelCoworkingSpace : update(req.params.id, req.body)
+else not found in database
+    controllersCoworkingSpaces -> client : res.status(404).json({ success: false,message: `No coworking space with id ${req.params.id}` })
+end
+modelCoworkingSpace -> CoworkingSpacesDatabase : CoworkingSpaceSchema
 CoworkingSpacesDatabase --> modelCoworkingSpace --: modifiedCoworkingSpace
 controllersCoworkingSpaces <-- modelCoworkingSpace --: modifiedCoworkingSpace
-controllersCoworkingSpaces-->client --: res.status(200).json({ success: true, data: modifiedCoworkingSpace.dataValues })
+controllersCoworkingSpaces-->client : res.status(200).json({ success: true, data: modifiedCoworkingSpace.dataValues })
+
 
 @enduml

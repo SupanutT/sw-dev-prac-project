@@ -10,18 +10,18 @@ participant "<<router>>\n:auth" as routerAuth
 participant "<<controllers>>\n:auth" as controllersAuth
 participant "<<utils>>\n:auth" as utilsAuth
 participant "<<model>>\n:User" as modelUser
-database "<<MySQL>>\n:users" as UserDatabase
+database "<<MySQL>>\n:coworkingspaces" as CoworkingSpacesDatabase
 
 client->server ++:req.post('/register')
 server->routerAuth ++:app.use('/auth',auth)
 routerAuth->controllersAuth ++:register(req.body)
 controllersAuth->modelUser ++:create(req.body)
-modelUser->UserDatabase ++:UserSchema
-UserDatabase-->modelUser --:user
+modelUser->CoworkingSpacesDatabase ++:UserSchema
+CoworkingSpacesDatabase-->modelUser --:user
 modelUser-->controllersAuth --:user
 controllersAuth->utilsAuth ++:sendActivateAccountToken(user)
 utilsAuth->modelUser ++:save()
-modelUser->UserDatabase ++:UserSchema
+modelUser->CoworkingSpacesDatabase ++:UserSchema
 controllersAuth-->client --:res.status(201).json({ success: true, email: user.email, activateAccountToken: user.activateAccountToken })
 
 

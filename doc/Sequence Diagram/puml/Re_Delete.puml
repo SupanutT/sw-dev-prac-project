@@ -10,7 +10,7 @@ participant "<<router>>\n:reservations" as routerReservations
 participant "<<middleware>>\n:auth" as middleware
 participant "<<controllers>>\n:reservations" as controllersReservations
 participant "<<model>>\n:Reservations" as modelReservation
-database "<<MySQL>>\n:reservations" as ReservationsDatabase
+database "<<MySQL>>\n:coworkingspaces" as CoworkingSpacesDatabase
 
 client -> server ++:req.delete('/reservations/:id')
 server -> routerReservations ++:app.use('/reservations' ,reservations)
@@ -23,10 +23,17 @@ else Not logged in yet
 else Wrong role
     middleware --> client --: res.status(403).json({ sucess: false, message: `User role ${req.user.role} is not authorized to access this route` })
 end
-controllersReservations -> modelReservation ++: update(req.params.id, req.body)
-modelReservation -> ReservationsDatabase ++: ReservationSchema
-ReservationsDatabase --> modelReservation --: reservation
-controllersReservations <-- modelReservation --: reservation
-controllersReservations --> client --: res.status(200).json({ success: true, data: {} });
+controllersReservations -> modelReservation ++: findByPk(req.params.id)
+modelReservation -> CoworkingSpacesDatabase ++: ReservationSchema
+CoworkingSpacesDatabase --> modelReservation : reservation
+controllersReservations <-- modelReservation : reservation
+alt found in database
+    controllersReservations -> modelReservation : destroy(req.params.id)
+else not found in database
+    controllersReservations -> client : res.status(404).json({ success: false,message: `No reservation with id ${req.params.id}` })
+end
+modelReservation -> CoworkingSpacesDatabase : ReservationSchema
+CoworkingSpacesDatabase --> modelReservation --: reservation
+controllersReservations --> client --: res.status(200).json({ success: true, data: {} })
 
 @enduml

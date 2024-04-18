@@ -10,7 +10,7 @@ participant "<<router>>\n:reservations" as routerReservations
 participant "<<middleware>>\n:auth" as middleware
 participant "<<controllers>>\n:reservations" as controllersReservations
 participant "<<model>>\n:Reservations" as modelReservation
-database "<<MySQL>>\n:reservations" as ReservationsDatabase
+database "<<MySQL>>\n:coworkingspaces" as CoworkingSpacesDatabase
 
 client -> server ++:req.get('/reservations')
 server -> routerReservations ++:app.use('/reservations' ,reservations)
@@ -21,10 +21,15 @@ alt Already logged in
 else Not logged in yet
     middleware --> client : res.status(401).json({ sucess: false, message: 'Not authorize to access this route' })
 end
-controllersReservations -> modelReservation ++: findAll()
-modelReservation -> ReservationsDatabase ++: ReservationSchema
-ReservationsDatabase --> modelReservation --: reservations
+alt req.user.role === "user"
+    controllersReservations -> modelReservation ++: findAll(req.user.id)
+else req.user.role === "admin"
+    controllersReservations -> modelReservation : findAll()
+end
+
+modelReservation -> CoworkingSpacesDatabase ++: ReservationSchema
+CoworkingSpacesDatabase --> modelReservation --: reservations
 controllersReservations <-- modelReservation --: reservations
-controllersReservations --> client --:res.status(200).json({ success: true, count: reservations.length, data: reservations });
+controllersReservations --> client --:res.status(200).json({ success: true, count: reservations.length, data: reservations })
 
 @enduml

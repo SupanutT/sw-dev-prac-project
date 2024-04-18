@@ -18,6 +18,10 @@ controllersCoworkingSpaces-> modelCoworkingSpace ++:findByPk(req.params.id)
 modelCoworkingSpace -> CoworkingSpacesDatabase ++: CoworkingSpaceSchema
 CoworkingSpacesDatabase --> modelCoworkingSpace --: coworkingspace
 controllersCoworkingSpaces <-- modelCoworkingSpace --:coworkingspace
-controllersCoworkingSpaces-->client --:res.status(200).json({ success: true, data: coworkingspace.dataValues });
+alt found in database
+    controllersCoworkingSpaces-->client :res.status(200).json({ success: true, data: coworkingspace.dataValues })
+else not found in database
+    controllersCoworkingSpaces-->client --:res.status(404).json({ success: false, message: `Coworking space with id ${req.params.id} was not found` })
+end
 
 @enduml

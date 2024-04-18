@@ -23,8 +23,17 @@ else Not logged in yet
 else Wrong role
     middleware --> client --: res.status(403).json({ sucess: false, message: `User role ${req.user.role} is not authorized to access this route` })
 end
-controllersCoworkingSpaces-> modelCoworkingSpace ++:delete(req.params.id)
-modelCoworkingSpace -> CoworkingSpacesDatabase --++: CoworkingSpaceSchema
-controllersCoworkingSpaces-->client --: res.status(200).json({ success: true, data: {} });
+controllersCoworkingSpaces -> modelCoworkingSpace ++: findByPk(req.params.id)
+modelCoworkingSpace -> CoworkingSpacesDatabase ++: CoWorkingSpaceSchema
+CoworkingSpacesDatabase --> modelCoworkingSpace : coworkingspace
+controllersCoworkingSpaces <-- modelCoworkingSpace : coworkingspace
+alt found in database
+    controllersCoworkingSpaces -> modelCoworkingSpace : delete(req.params.id)
+else not found in database
+    controllersCoworkingSpaces -> client : res.status(404).json({ success: false,message: `No coworking space with id ${req.params.id}` })
+end
+modelCoworkingSpace -> CoworkingSpacesDatabase : CoworkingSpaceSchema
+CoworkingSpacesDatabase --> modelCoworkingSpace --: coworkingspace
+controllersCoworkingSpaces-->client : res.status(200).json({ success: true, data: {} })
 
 @enduml
