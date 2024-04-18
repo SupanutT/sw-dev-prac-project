@@ -18,7 +18,8 @@ server -> routerCoworkingSpaces ++:app.use('/coworkingspaces',coworkingspaces)
 routerCoworkingSpaces -> routerReservations ++:router.use('/:coworkingSpaceId/reservations/', reservationRouter)
 routerReservations -> middleware ++:protect()\nauthorize('admin','user')
 alt Already logged in and correct role
-    middleware -> controllersReservations ++: addReservation()
+    middleware --> routerReservations : next()
+    routerReservations -> controllersReservations ++: addReservation()
 else Not logged in yet
     middleware --> client : res.status(401).json({ sucess: false, message: 'Not authorize to access this route' })
 else Wrong role

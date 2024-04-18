@@ -16,7 +16,8 @@ client -> server ++:req.get('/reservations/:id')
 server -> routerReservations ++:app.use('/reservations' ,reservations)
 routerReservations -> middleware ++:protect()
 alt Already logged in
-    middleware -> controllersReservations ++: getReservation()
+    middleware --> routerReservations : next()
+    routerReservations -> controllersReservations ++: getReservation()
 else Not logged in yet
     middleware --> client : res.status(401).json({ sucess: false, message: 'Not authorize to access this route' })
 end

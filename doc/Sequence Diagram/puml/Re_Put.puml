@@ -16,7 +16,8 @@ client -> server ++:req.put('/reservations/:id')
 server -> routerReservations ++:app.use('/reservations' ,reservations)
 routerReservations -> middleware ++:protect()\nauthorize('admin','user')
 alt Already logged in and correct role
-    middleware -> controllersReservations ++: updateReservation()
+    middleware --> routerReservations : next()
+    routerReservations -> controllersReservations ++: updateReservation()
 else Not logged in yet
     middleware --> client : res.status(401).json({ sucess: false, message: 'Not authorize to access this route' })
 else Wrong role
