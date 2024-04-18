@@ -1,0 +1,33 @@
+@startuml Manage User (GET Activate)
+
+header Coworking Space Reservation System Sequence Diagram
+footer Group Yossawat & Supanut
+title "Manage User (GET Activate)"
+
+participant "Client" as client
+participant "<<javaScript>>\n:server" as server
+participant "<<router>>\n:auth" as routerAuth
+participant "<<controllers>>\n:auth" as controllersAuth
+participant "<<model>>\n:User" as modelUser
+database "<<MySQL>>\n:users" as UserDatabase
+
+client->server ++:req.post('/activate/:id')
+server->routerAuth ++:app.use('/auth',auth)
+routerAuth->controllersAuth ++:login()
+controllersAuth->modelUser ++:findOne(req.params.id)
+modelUser->UserDatabase ++:UserSchema
+UserDatabase-->modelUser --:user
+modelUser-->controllersAuth --:user
+alt No User Found
+    controllersAuth-->client :res.status(404).json({ success: false, message: 'The user is not found' })
+else User is already activated
+    controllersAuth-->client :res.status(400).json({ success: false, message: 'The user is already active' })
+else Account Token is expired
+    controllersAuth-->client :res.status(400).json({ success: false, message: 'The user activation code is expired' })
+end
+controllersAuth->modelUser ++:save()
+modelUser->UserDatabase ++:UserSchema
+UserDatabase-->modelUser --:user
+modelUser-->controllersAuth --:user
+controllersAuth-->client :res.status(200).json({ success: true, message: 'The user is successfully activated' })
+

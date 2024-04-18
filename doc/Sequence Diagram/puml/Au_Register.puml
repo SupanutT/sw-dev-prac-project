@@ -1,0 +1,27 @@
+@startuml Manage User (POST Register)
+
+header Coworking Space Reservation System Sequence Diagram
+footer Group Yossawat & Supanut
+title "Manage User (POST Register)"
+
+participant "Client" as client
+participant "<<javaScript>>\n:server" as server
+participant "<<router>>\n:auth" as routerAuth
+participant "<<controllers>>\n:auth" as controllersAuth
+participant "<<utils>>\n:auth" as utilsAuth
+participant "<<model>>\n:User" as modelUser
+database "<<MySQL>>\n:users" as UserDatabase
+
+client->server ++:req.post('/register')
+server->routerAuth ++:app.use('/auth',auth)
+routerAuth->controllersAuth ++:register(req.body)
+controllersAuth->modelUser ++:create(req.body)
+modelUser->UserDatabase ++:UserSchema
+UserDatabase-->modelUser --:user
+modelUser-->controllersAuth --:user
+controllersAuth->utilsAuth ++:sendActivateAccountToken(user)
+utilsAuth->modelUser ++:save()
+modelUser->UserDatabase ++:UserSchema
+controllersAuth-->client --:res.status(201).json({ success: true, email: user.email, activateAccountToken: user.activateAccountToken })
+
+

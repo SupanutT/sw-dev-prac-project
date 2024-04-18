@@ -1,0 +1,38 @@
+@startuml Manage User (POST Login)
+
+header Coworking Space Reservation System Sequence Diagram
+footer Group Yossawat & Supanut
+title "Manage User (POST Login)"
+
+participant "Client" as client
+participant "<<javaScript>>\n:server" as server
+participant "<<router>>\n:auth" as routerAuth
+participant "<<controllers>>\n:auth" as controllersAuth
+participant "<<utils>>\n:auth" as utilsAuth
+participant "<<model>>\n:User" as modelUser
+database "<<MySQL>>\n:users" as UserDatabase
+
+client->server ++:req.post('/login')
+server->routerAuth ++:app.use('/auth',auth)
+routerAuth->controllersAuth ++:login(req.body)
+alt No email and password provided
+    controllersAuth-->client :res.status(400).json({ success: false, message: 'Please provide an email and password' })
+end
+controllersAuth->modelUser ++:findOne(req.body.email)
+modelUser->UserDatabase ++:UserSchema
+UserDatabase-->modelUser --:user
+modelUser-->controllersAuth --:user
+alt User not found
+    controllersAuth-->client :res.status(400).json({ success: false, message: 'Wrong Email or Password!' })
+end
+controllersAuth->modelUser ++:matchPassword(req.body.password)
+modelUser-->controllersAuth --:isMatch
+alt Invalid Credentials
+    controllersAuth-->client :res.status(401).json({ success: false, message: 'Invalid credentials' })
+else User is not activated
+    controllersAuth-->client :res.status(400).json({ success: false, message: 'Please activate the account' })    
+end
+controllersAuth->utilsAuth ++:sendTokenResponse(user)
+utilsAuth-->client --:res.status(statusCode).cookie('token', token, options).json({ success: true, id: user.dataValues.id, firstName: user.dataValues.firstName, lastName: user.dataValues.lastName, email: user.email })
+
+
