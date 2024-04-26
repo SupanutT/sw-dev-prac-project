@@ -37,7 +37,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"firstName\": \"{{$randomFirstName}}\",\r\n    \"lastName\": \"{{$randomLastName}}\",\r\n    \"phoneNumber\": \"021234567\",\r\n    \"email\": \"{{$randomUserName}}@test.com\",\r\n    // \"email\": \"test@test.com\",\r\n    // \"email\": \"supanut.tangsin@gmail.com\",\r\n    \"password\": \"root1234\",\r\n    \"role\": \"user\"\r\n}",
+							"raw": "{\r\n    \"firstName\": \"{{$randomFirstName}}\",\r\n    \"lastName\": \"{{$randomLastName}}\",\r\n    \"phoneNumber\": \"021234567\",\r\n    // \"email\": \"soeibanshi@gmail.com\",\r\n    \"email\": \"{{$randomUserName}}@test.com\",\r\n    \"password\": \"root1234\",\r\n    \"role\": \"user\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -384,7 +384,7 @@
 									"    pm.expect(response.count).to.be.above(0)\r",
 									"})\r",
 									"\r",
-									"postman.setNextRequest(\"addReservation\")"
+									"postman.setNextRequest(\"addReservation (1st)\")"
 								],
 								"type": "text/javascript",
 								"packages": {}
@@ -696,13 +696,13 @@
 					"response": []
 				},
 				{
-					"name": "addReservation",
+					"name": "addReservation (1st)",
 					"event": [
 						{
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Status code is 200\", function () {\r",
+									"pm.test(\"Status code is 201\", function () {\r",
 									"    pm.response.to.have.status(201);\r",
 									"});\r",
 									"\r",
@@ -710,7 +710,7 @@
 									"\r",
 									"pm.environment.set('reservationId', response.data.id)\r",
 									"\r",
-									"postman.setNextRequest(\"getReservation\")"
+									"postman.setNextRequest(\"addReservation (2nd)\")"
 								],
 								"type": "text/javascript",
 								"packages": {}
@@ -753,13 +753,13 @@
 					"response": []
 				},
 				{
-					"name": "addReservation (for admin role)",
+					"name": "addReservation (2nd)",
 					"event": [
 						{
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Status code is 200\", function () {\r",
+									"pm.test(\"Status code is 201\", function () {\r",
 									"    pm.response.to.have.status(201);\r",
 									"});\r",
 									"\r",
@@ -767,7 +767,235 @@
 									"\r",
 									"pm.environment.set('reservationId', response.data.id)\r",
 									"\r",
-									"postman.setNextRequest('Log out')"
+									"postman.setNextRequest(\"addReservation (3rd)\")"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"reservationDate\": \"{{$randomDateFuture}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{backendIPAddress}}/api/v1/coworkingspaces/:coworkingSpaceId/reservations/",
+							"host": [
+								"{{backendIPAddress}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"coworkingspaces",
+								":coworkingSpaceId",
+								"reservations",
+								""
+							],
+							"variable": [
+								{
+									"key": "coworkingSpaceId",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "addReservation (3rd)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {\r",
+									"    pm.response.to.have.status(201);\r",
+									"});\r",
+									"\r",
+									"const response = pm.response.json();\r",
+									"\r",
+									"pm.environment.set('reservationId', response.data.id)\r",
+									"\r",
+									"postman.setNextRequest(\"addReservation (4th | unable)\")"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"reservationDate\": \"{{$randomDateFuture}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{backendIPAddress}}/api/v1/coworkingspaces/:coworkingSpaceId/reservations/",
+							"host": [
+								"{{backendIPAddress}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"coworkingspaces",
+								":coworkingSpaceId",
+								"reservations",
+								""
+							],
+							"variable": [
+								{
+									"key": "coworkingSpaceId",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "addReservation (4th | unable)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 400\", function () {\r",
+									"    pm.response.to.have.status(400);\r",
+									"});\r",
+									"\r",
+									"const response = pm.response.json();\r",
+									"\r",
+									"// pm.environment.set('reservationId', response.data.id)\r",
+									"\r",
+									"postman.setNextRequest(\"addReservation (invalid coworkingspace)\")"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"reservationDate\": \"{{$randomDateFuture}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{backendIPAddress}}/api/v1/coworkingspaces/:coworkingSpaceId/reservations/",
+							"host": [
+								"{{backendIPAddress}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"coworkingspaces",
+								":coworkingSpaceId",
+								"reservations",
+								""
+							],
+							"variable": [
+								{
+									"key": "coworkingSpaceId",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "addReservation (invalid coworkingspace)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 404\", function () {\r",
+									"    pm.response.to.have.status(404);\r",
+									"});\r",
+									"\r",
+									"const response = pm.response.json();\r",
+									"\r",
+									"// pm.environment.set('reservationId', response.data.id)\r",
+									"\r",
+									"postman.setNextRequest(\"getReservation\")"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"reservationDate\": \"{{$randomDateFuture}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{backendIPAddress}}/api/v1/coworkingspaces/:coworkingSpaceId/reservations/",
+							"host": [
+								"{{backendIPAddress}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"coworkingspaces",
+								":coworkingSpaceId",
+								"reservations",
+								""
+							],
+							"variable": [
+								{
+									"key": "coworkingSpaceId",
+									"value": "99999"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "addReservation (for admin)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {\r",
+									"    pm.response.to.have.status(201);\r",
+									"});\r",
+									"\r",
+									"const response = pm.response.json();\r",
+									"\r",
+									"pm.environment.set('reservationId', response.data.id)\r",
+									"\r",
+									"postman.setNextRequest(\"Log out\")"
 								],
 								"type": "text/javascript",
 								"packages": {}
@@ -922,7 +1150,7 @@
 									"    pm.response.to.have.status(200);\r",
 									"});\r",
 									"\r",
-									"postman.setNextRequest('addReservation (for admin role)')"
+									"postman.setNextRequest('addReservation (for admin)')"
 								],
 								"type": "text/javascript",
 								"packages": {}

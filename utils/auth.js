@@ -30,12 +30,10 @@ const transporter = nodemailer.createTransport({
 });
 
 const sendActivateAccountToken = async (user) => {
-    const email = user.email;
     const activateAccountToken = randomToken(16);
     user.activateAccountToken = activateAccountToken;
     const today = new Date();
     const activateAccountExpire = new Date(today.setDate(today.getDate() + 1));
-    // const activateAccountExpire = today;
     user.activateAccountExpire = activateAccountExpire;
     await user.save();
     sendEmail(
