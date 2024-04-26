@@ -25,6 +25,7 @@ logout -- admin
 activateAccount -- admin
 manageReservation -- admin
 manageCoworkingSpace -- admin
+viewCoworkingSpaces -- admin
 
 actor "<<service>>\nGoogle SMTP" as smtp
 activateAccount -- smtp
